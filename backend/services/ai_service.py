@@ -4,11 +4,11 @@ def analyze_image(image):
     """
 
     try:
-        # read image bytes
+        # Read image bytes
         image_bytes = image.file.read()
         file_size = len(image_bytes)
 
-        # simple logic based on image size
+        # Determine severity based on image size
         if file_size < 200000:
             severity = "LOW"
         elif file_size < 500000:
@@ -20,34 +20,60 @@ def analyze_image(image):
 
         confidence = 85
 
+        # Risk description (useful for demo explanation)
+        risk_descriptions = {
+            "LOW": "Minor road surface damage with low impact on vehicles.",
+            "MEDIUM": "Moderate pothole that may affect small vehicles.",
+            "HIGH": "Large pothole causing traffic disruption and vehicle damage risk.",
+            "CRITICAL": "Severe pothole posing serious accident risk and immediate repair required."
+        }
+
+        risk_description = risk_descriptions.get(severity)
+
     except Exception:
         severity = "MEDIUM"
         confidence = 70
+        risk_description = "Road damage detected."
 
     return {
         "severity": severity,
         "confidence": confidence,
+        "risk_level": severity,
+        "risk_description": risk_description,
         "incident_type": "pothole"
     }
 
 
 def generate_complaint(location, severity, latitude, longitude):
     """
-    Generates a complaint message for authorities.
+    Generates a complaint message for municipal authorities.
     """
+
+    risk_messages = {
+        "LOW": "Minor road surface damage detected.",
+        "MEDIUM": "Moderate pothole affecting vehicle movement.",
+        "HIGH": "Serious pothole causing traffic disruption.",
+        "CRITICAL": "Severe pothole posing accident risk and requiring urgent repair."
+    }
+
+    description = risk_messages.get(severity, "Road damage detected.")
 
     complaint = f"""
 Subject: Urgent pothole repair request
 
 Location: {location}
-Severity: {severity}
+Severity Level: {severity}
 Coordinates: {latitude}, {longitude}
 
-A pothole has been detected at the above location and poses a risk to vehicles and pedestrians.
+Issue Description:
+{description}
 
-Kindly arrange for immediate repair to prevent accidents and traffic disruption.
+This issue has been detected through the RoadSense AI monitoring system.
 
-Reported by RoadSense AI system.
+Immediate inspection and repair are recommended to prevent accidents and traffic disruption.
+
+Reported by:
+RoadSense AI Automated Road Monitoring System
 """
 
     return complaint
